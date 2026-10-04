@@ -1,0 +1,66 @@
+{
+  "recovery": [
+    {
+      "horse_num": 5,
+      "purchase_score": 3.929513223332678,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 2,
+      "purchase_score": 0.4073974008000595,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 3,
+      "purchase_score": 0.3450489923054845,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 1,
+      "purchase_score": 0.25182560786170394,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 18,
+      "purchase_score": 0.2186939566217517,
+      "selected": false,
+      "bet_amount": 0
+    }
+  ],
+  "accuracy": [
+    {
+      "horse_num": 3,
+      "purchase_score": 6.499999999854511,
+      "selected": true,
+      "bet_amount": 600
+    },
+    {
+      "horse_num": 2,
+      "purchase_score": 2.305118559215829e-10,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 18,
+      "purchase_score": 1.5673878892303592e-14,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 8,
+      "purchase_score": 2.971278688146891e-22,
+      "selected": false,
+      "bet_amount": 0
+    },
+    {
+      "horse_num": 12,
+      "purchase_score": 1.7038545363253188e-23,
+      "selected": false,
+      "bet_amount": 0
+    }
+  ]
+}

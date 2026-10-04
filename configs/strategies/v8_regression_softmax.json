@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "name": "v8_regression_softmax",
+  "settings": {
+    "task": "regression",
+    "model": "models/v8_regression/model_rank_23.pkl",
+    "test_data": "data/learn_data/learn_data_jsp_regression_test.csv",
+    "bet_type": "win",
+    "normalization": "softmax",
+    "temperature": 0.042925,
+    "top_n": 1,
+    "score_threshold": 1.4,
+    "max_odds": 30.0,
+    "staking": "expected-value",
+    "base_bet": 100,
+    "exclude_grade": 6.0
+  },
+  "evaluation": {
+    "total_races": 2286,
+    "race_count": 2089,
+    "skipped_races": 197,
+    "hit_count": 456,
+    "hit_rate": 21.828626136907612,
+    "recovery_rate": 108.79072860264083,
+    "total_bet": 1052700.0,
+    "total_return": 1145240.0,
+    "profit": 92540.0,
+    "period": "2026-01 through 2026-09",
+    "independent_validation": false,
+    "meets_hit_rate_over_10": true
+  }
+}

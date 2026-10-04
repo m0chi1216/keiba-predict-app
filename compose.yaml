@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    init: true
+    restart: unless-stopped
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:-}
+    expose:
+      - "8000"
+    volumes:
+      - prediction_data:/app/data/webapp
+    shm_size: 512mb
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  prediction_data:

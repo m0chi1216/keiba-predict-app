@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "name": "v8_classification_auto",
+  "settings": {
+    "task": "classification",
+    "model": "models/v8/model_jsp_23.pkl",
+    "test_data": "data/learn_data/learn_data_jsp_test.csv",
+    "bet_type": "win",
+    "normalization": "auto",
+    "temperature": 1.0,
+    "top_n": 5,
+    "score_threshold": 1.1188666546231707,
+    "max_odds": 50.0,
+    "staking": "expected-value",
+    "base_bet": 100,
+    "exclude_grade": 6.0
+  },
+  "evaluation": {
+    "total_races": 2286.0,
+    "race_count": 2091.0,
+    "skipped_races": 195.0,
+    "hit_count": 126.0,
+    "hit_rate": 6.025824964131994,
+    "recovery_rate": 139.55991875423155,
+    "total_bet": 738500.0,
+    "total_return": 1030650.0,
+    "profit": 292150.0,
+    "period": "2026-01 through 2026-09",
+    "independent_validation": false,
+    "meets_hit_rate_over_10": false
+  }
+}

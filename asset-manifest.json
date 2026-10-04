@@ -1,0 +1,45 @@
+{
+  "exported_at": "2026-10-04T09:27:04.913396",
+  "assets": {
+    "models/v8/model_jsp_23.pkl": {
+      "bytes": 7755599,
+      "sha256": "9c5d79ed53ac44cd92b21776363845814ec0fff54ef0f279b71b5308d1128d0d"
+    },
+    "models/v8/label_encoders_23.pkl": {
+      "bytes": 3283091,
+      "sha256": "af53f4fe86c6affc3df47d182efa508ec2fb7756346d8363861bc15a5fc010a7"
+    },
+    "models/v8_regression/model_rank_23.pkl": {
+      "bytes": 6597149,
+      "sha256": "eac8b3d2aae78c4467b4eb4cbcdae08c106dcf0b9be12bd49f884876003472fb"
+    },
+    "models/v8_regression/label_encoders_23.pkl": {
+      "bytes": 3283091,
+      "sha256": "af53f4fe86c6affc3df47d182efa508ec2fb7756346d8363861bc15a5fc010a7"
+    },
+    "configs/strategies/v8_classification_auto.json": {
+      "bytes": 884,
+      "sha256": "19c228ad67321866b7e3acd56f4f9567ac090e715f6ffbc03ed80d60887ded00"
+    },
+    "configs/strategies/v8_regression_softmax.json": {
+      "bytes": 887,
+      "sha256": "b847cb3debdc2087ea4a8ee9bf886ed4cf09f8b95a5289615772181d4d34bbea"
+    },
+    "data/ped_data/ped_data.csv": {
+      "bytes": 47950,
+      "sha256": "9d73488f803669238b00d1e8cf455ae269de1be8031c293a9454a211fcc1edd0"
+    },
+    "data/jockey_data/jockey_data.csv": {
+      "bytes": 32812,
+      "sha256": "11fae593a1f6091f863f764f15d60f476cdeee21bbd1c9c07cf9a4332e3a7d36"
+    },
+    "data/stable_data/stable_data.csv": {
+      "bytes": 25042,
+      "sha256": "07dc6543839597d94440671442ad8e3caa9e9903803113283c1743211e6ebdec"
+    },
+    "data/predict/20261004/京都_11.csv": {
+      "bytes": 28905,
+      "sha256": "54bfe5274b1cd754dd19f7f4f01902d2830046e8eafd8b380ee4a4947e49da7f"
+    }
+  }
+}
