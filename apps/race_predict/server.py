@@ -44,6 +44,19 @@ def execute_job(job_id, request):
         JOBS[job_id].update(payload)
 
 
+def job_snapshot(job_id):
+    with LOCK:
+        job = dict(JOBS.get(job_id, {}))
+    if job:
+        job["id"] = job_id
+    logfile = job.pop("log", None)
+    if logfile:
+        with Path(logfile).open("rb") as stream:
+            stream.seek(max(0, Path(logfile).stat().st_size - 12000))
+            job["logs"] = stream.read().decode("utf-8", errors="replace")
+    return job
+
+
 class Handler(BaseHTTPRequestHandler):
     def setup(self):
         super().setup()
@@ -79,16 +92,14 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/healthz":
             return self.respond(200, {"status": "ok"})
-        if path.startswith("/api/jobs/"):
+        if path == "/api/jobs":
             with LOCK:
-                job = dict(JOBS.get(path.rsplit("/", 1)[-1], {}))
+                latest_id = next(reversed(JOBS), None)
+            return self.respond(200, {"job": job_snapshot(latest_id) if latest_id else None})
+        if path.startswith("/api/jobs/"):
+            job = job_snapshot(path.rsplit("/", 1)[-1])
             if not job:
                 return self.respond(404, {"error": "ジョブが見つかりません。"})
-            logfile = job.pop("log", None)
-            if logfile:
-                with Path(logfile).open("rb") as stream:
-                    stream.seek(max(0, Path(logfile).stat().st_size - 12000))
-                    job["logs"] = stream.read().decode("utf-8", errors="replace")
             return self.respond(200, job)
         assets = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"),
                   "/style.css": ("style.css", "text/css")}
@@ -123,7 +134,7 @@ class Handler(BaseHTTPRequestHandler):
             if any(job["status"] in {"queued", "running"} for job in JOBS.values()):
                 return self.respond(409, {"error": "別の処理を実行中です。完了後に再度お試しください。"})
             job_id = uuid.uuid4().hex
-            JOBS[job_id] = {"id": job_id, "status": "queued"}
+            JOBS[job_id] = {"id": job_id, "status": "queued", "request": request}
         threading.Thread(target=execute_job, args=(job_id, request), daemon=True).start()
         self.respond(202, {"id": job_id})
 

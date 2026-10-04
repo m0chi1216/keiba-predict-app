@@ -11,8 +11,9 @@ services:
     environment:
       APP_DOMAIN: ${APP_DOMAIN:?Set APP_DOMAIN in .env}
       ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+      AUTH_ENABLED: ${AUTH_ENABLED:-true}
       AUTH_USER: ${AUTH_USER:-admin}
-      AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:?Set AUTH_PASSWORD_HASH in .env}
+      AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:-}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

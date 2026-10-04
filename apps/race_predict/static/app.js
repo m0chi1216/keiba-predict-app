@@ -19,17 +19,27 @@ const fmt = (value, digits=2) => value == null ? '—' : Number(value).toLocaleS
 const stamp = value => new Date(value).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
 async function api(url, options) {
   const response = await fetch(url, options); const result = await response.json();
-  if(!response.ok) throw new Error(result.error || '通信エラー'); return result;
+  if(!response.ok) { const error=new Error(result.error || '通信エラー'); error.status=response.status; throw error; } return result;
 }
-async function job(request) {
+async function job(request, existing=null) {
   if(busy) return;
   notify(''); setBusy(true); $('progress').hidden=false; $('logs').textContent='処理を開始しています…';
   if(request.action==='predict') { $('results').hidden=true; $('empty').hidden=true; }
   $('progress-label').textContent=request.action==='races'?'開催レースを取得中':'データ作成・AI予測を実行中';
   try {
-    const created = await api('/api/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request)});
+    const created = existing || await api('/api/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request)});
+    let snapshot=existing;
     while(true) {
-      const current = await api('/api/jobs/'+created.id);
+      let current;
+      try {
+        current = snapshot || await api('/api/jobs/'+created.id);
+        snapshot=null; notify('');
+      } catch(error) {
+        if(error.status && error.status<500) throw error;
+        notify('接続を確認しています。サーバー側の処理は続いています。');
+        await new Promise(resolve => setTimeout(resolve,3000));
+        continue;
+      }
       $('logs').textContent=current.logs || '処理を開始しています…';
       $('logs').scrollTop=$('logs').scrollHeight;
       if(current.status==='error') throw new Error(current.error);
@@ -44,12 +54,16 @@ function populateRaces() {
   $('race-select').replaceChildren(...selected.map(race => {const option=node('option',`${race.number}R  ${race.name}`);option.value=race.race_id;return option;}));
 }
 $('track').onchange=populateRaces;
+function showRaces(result) {
+  races=result.races;
+  $('race-date').value=result.date;
+  $('track').replaceChildren(...[...new Set(races.map(race=>race.track))].map(track => node('option',track)));
+  populateRaces(); $('track').disabled=!races.length; $('race-select').disabled=!races.length;
+}
 $('load-races').onclick=async()=>{
   const result = await job({action:'races',date:$('race-date').value});
   if(!result) return;
-  races=result.races;
-  $('track').replaceChildren(...[...new Set(races.map(race=>race.track))].map(track => node('option',track)));
-  populateRaces(); $('track').disabled=false; $('race-select').disabled=false;
+  showRaces(result);
 };
 $('race-date').onchange=()=>{races=[];$('track').replaceChildren(node('option','開催レースを取得してください'));$('race-select').replaceChildren(node('option','レース未選択'));$('track').disabled=true;$('race-select').disabled=true;};
 $('predict').onclick=async()=>{
@@ -83,9 +97,28 @@ function render(result) {
       verdict.append(node('small',horse.selected?`単勝 ${fmt(horse.bet_amount,0)}円`:horse.reasons.join(' / ')));row.append(verdict);tbody.append(row);
     }
     table.append(tbody);wrap.append(table);section.append(wrap);
-    section.append(node('p',regression?'rankスコアは予測着順をsoftmax変換した値です。校正済みの勝率ではありません。購入スコア = rankスコア × 単勝オッズ。':'購入スコア = 勝率 × 単勝オッズ。表示順は勝率上位5頭の中で購入スコアが高い順です。','footnote'));
+    if(!model.horses.length) section.append(node('p','上位5頭にオッズ条件を満たす馬がいません。','footnote'));
+    section.append(node('p',regression?'rankスコアは予測着順をsoftmax変換した値です。校正済みの勝率ではありません。購入スコア = rankスコア × 単勝オッズ。':'購入スコア = 勝率 × 単勝オッズ。勝率上位5頭のうちオッズ条件を満たす馬を、購入スコアが高い順に表示します。','footnote'));
     const bought=model.horses.filter(h=>h.selected);
     section.append(node('p',bought.length?'購入条件に適合する馬のうち、購入スコア最大の1頭を購入対象にしています。':'この設定では購入対象がありません。','footnote'));
     $('results').append(section);
   }
 }
+
+async function restoreJob() {
+  setBusy(true);
+  try {
+    const {job:latest}=await api('/api/jobs');
+    setBusy(false);
+    if(!latest) return;
+    const request=latest.request;
+    if(request.action==='predict') {
+      setMode('id'); $('race-id').value=request.race_id; $('use-saved').checked=!!request.use_saved;
+      document.querySelectorAll('input[name=ai]').forEach(el => el.checked=request.strategies.includes(el.value));
+    } else { setMode('list'); $('race-date').value=request.date; }
+    const result=await job(request,latest);
+    if(result) { if(request.action==='predict') render(result); else showRaces(result); }
+  } catch(error) { notify('前回の処理を確認できませんでした。ページを再読み込みしてください。'); }
+  finally { setBusy(false); }
+}
+restoreJob();

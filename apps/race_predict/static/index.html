@@ -4,7 +4,7 @@
 <body>
 <header><a class="brand" href="/">RACE <span>LAB</span></a><span class="local">LOCAL WORKSPACE</span></header>
 <main>
-<section class="intro"><p class="eyebrow">AI RACE PREDICTION</p><h1>レースを選ぶ。<br>2つの視点で、予想する。</h1><p>回収率と的中率。それぞれのAIで購入候補を確認できます。</p></section>
+<section class="intro"><p class="eyebrow">AI RACE PREDICTION</p><h1>競馬予想アプリ</h1><p>回収率と的中率。それぞれのAIで購入候補を確認できます。</p></section>
 <div class="workspace">
 <aside class="panel controls"><p class="step">01 / RACE</p><h2>対象レース</h2>
 <div class="tabs" role="group" aria-label="レース指定方法"><button id="id-tab" class="active" type="button" aria-pressed="true">race idを入力</button><button id="list-tab" type="button" aria-pressed="false">開催レースから選ぶ</button></div>
@@ -16,8 +16,8 @@
 <label class="saved"><input id="use-saved" type="checkbox">保存済みの予測用データを利用</label><p class="hint">通常は最新の出馬表・オッズを取得します。保存済みデータのオッズは取得時点の値です。</p>
 <button id="predict" class="primary" type="button">予想を表示 <span>→</span></button>
 </aside>
-<section class="results-area" aria-label="予想結果"><div id="notice" role="status" aria-live="polite"></div><div id="progress" class="panel" hidden><div class="progress-title"><span class="spinner"></span><strong id="progress-label">予測データを準備中</strong></div><p class="hint">データ取得は数分かかる場合があります。この画面で完了をお待ちください。</p><details open><summary>進捗ログ</summary><pre id="logs"></pre></details></div>
-<div id="empty" class="panel empty"><div class="empty-icon">↗</div><p class="eyebrow">READY TO PREDICT</p><h2>次のレースを、読み解く。</h2><p>レースとAIを選択すると、<br>上位5頭のスコアと購入判定をここに表示します。</p><div class="legend"><span class="pill selected">購入対象</span><span class="pill eligible">条件適合</span><span class="pill neutral">見送り</span></div></div>
+<section class="results-area" aria-label="予想結果"><div id="notice" role="status" aria-live="polite"></div><div id="progress" class="panel" hidden><div class="progress-title"><span class="spinner"></span><strong id="progress-label">予測データを準備中</strong></div><p class="hint">ページを閉じても処理は続きます。再度開くと最新の進捗・結果を確認できます。</p><details open><summary>進捗ログ</summary><pre id="logs"></pre></details></div>
+<div id="empty" class="panel empty"><div class="empty-icon">↗</div><p class="eyebrow">READY TO PREDICT</p><h2>次のレースを、読み解く。</h2><p>レースとAIを選択すると、<br>上位5頭のうちオッズ条件を満たす馬のスコアと購入判定を表示します。</p><div class="legend"><span class="pill selected">購入対象</span><span class="pill eligible">条件適合</span><span class="pill neutral">見送り</span></div></div>
 <div id="results"></div></section>
-</div><footer>勝率上位5頭（回帰は予測着順上位5頭）を抽出し、購入スコアの高い順に表示。購入判定は保存設定に従う単勝です。</footer>
+</div><footer>勝率上位5頭（回帰は予測着順上位5頭）のうち、1倍を超えオッズ上限以下の馬を購入スコア順に表示。購入判定は保存設定に従う単勝です。</footer>
 </main></body></html>

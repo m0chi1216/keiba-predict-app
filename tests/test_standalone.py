@@ -11,6 +11,7 @@ from urllib.request import Request, urlopen
 from http.server import ThreadingHTTPServer
 
 import numpy as np
+import pandas as pd
 
 from apps.race_predict import service, server
 from apps.race_predict.assets import verify_assets
@@ -22,11 +23,13 @@ class StandaloneTests(unittest.TestCase):
 
     def test_both_packaged_models_match_original_cli(self):
         expected = json.loads((Path(__file__).parent / "expected_sample.json").read_text(encoding="utf-8"))
-        with contextlib.redirect_stdout(io.StringIO()):
+        sample = service.ROOT / "data/predict/20261004/京都_11.csv"
+        with contextlib.redirect_stdout(io.StringIO()), patch.object(service, "find_saved_input", return_value=sample):
             result = service.run_prediction({"race_id": "202608040211", "strategies": ["recovery", "accuracy"], "use_saved": True})
+        odds = pd.read_csv(sample).set_index("horse_num")["ods"]
         for model in result["models"]:
-            rows = expected[model["key"]]
-            self.assertEqual(len(model["horses"]), 5)
+            rows = [row for row in expected[model["key"]] if 1 < odds.loc[row["horse_num"]] <= model["settings"]["max_odds"]]
+            self.assertEqual(len(model["horses"]), len(rows))
             self.assertEqual([int(row["horse_num"]) for row in model["horses"]], [row["horse_num"] for row in rows])
             for actual, original in zip(model["horses"], rows):
                 np.testing.assert_allclose(actual["purchase_score"], original["purchase_score"], rtol=1e-12)

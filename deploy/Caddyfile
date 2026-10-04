@@ -1,14 +1,21 @@
 {
-    email {$ACME_EMAIL}
+	email {$ACME_EMAIL}
+}
+
+(auth_true) {
+	basic_auth {
+		{$AUTH_USER} {$AUTH_PASSWORD_HASH}
+	}
+}
+
+(auth_false) {
 }
 
 {$APP_DOMAIN} {
-    basic_auth {
-        {$AUTH_USER} {$AUTH_PASSWORD_HASH}
-    }
-    reverse_proxy app:8000
-    header {
-        X-Content-Type-Options nosniff
-        Referrer-Policy same-origin
-    }
+	import auth_{$AUTH_ENABLED:true}
+	reverse_proxy app:8000
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+	}
 }

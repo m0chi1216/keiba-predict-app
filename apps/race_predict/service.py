@@ -126,8 +126,11 @@ def find_saved_input(race_id):
 def present_result(result, settings):
     import pandas as pd
     from src.betting_strategy import make_candidates
-    # Display five even when the strategy only allows one, or excludes the race grade.
+    # Start with the top five even when the strategy only allows one, or excludes the race grade.
     display = make_candidates(result, 5, settings["normalization"], settings["temperature"])
+    # Keep the original model ranking and purchase decisions; do not backfill excluded horses.
+    display = display[display["ods"].map(lambda odds: pd.notna(odds) and math.isfinite(odds)
+                                        and 1 < odds <= settings["max_odds"]).astype(bool)]
     display = display.sort_values("expected_value", ascending=False, kind="stable", na_position="last")
     horses = []
     for _, row in display.iterrows():
@@ -137,10 +140,6 @@ def present_result(result, settings):
         if not row["is_candidate"]:
             reasons.append(f"購入候補の上位{settings['top_n']}頭の範囲外")
         odds = row["ods"]
-        if pd.isna(odds) or not float("-inf") < odds < float("inf") or odds <= 1:
-            reasons.append("有効な単勝オッズなし")
-        elif odds > settings["max_odds"]:
-            reasons.append("オッズ上限超過")
         if pd.isna(row["expected_value"]) or row["expected_value"] <= settings["score_threshold"]:
             reasons.append("購入スコア条件未達")
         eligible = pd.notna(row["recommend_rank"])

@@ -4,8 +4,9 @@
 
 - race idの入力、またはnetkeibaの開催日・競馬場・レース選択
 - 回収率重視AI（v8_classification_auto）/ 的中率重視AI（v8_regression_softmax）/ 両方
-- 勝率上位5頭（回帰は予測着順上位5頭）を購入スコア順に表示
+- 勝率上位5頭（回帰は予測着順上位5頭）のうちオッズ条件を満たす馬を購入スコア順に表示
 - 購入対象、条件適合、見送り理由、購入額の表示
+- ページを閉じてもデータ取得・予測を継続し、開き直すと最新ジョブの進捗・結果を復元（サーバー稼働中）
 
 ## ローカル起動
 
@@ -39,7 +40,7 @@ python -m venv .venv
 docker compose -f compose.yaml -f compose.public.yaml up -d --build
 ```
 
-CaddyがHTTPS証明書を取得・更新し、ログイン認証を行います。アプリの8000番ポートは外部公開しません。モデルはイメージに含まれ、取得データはDocker volumeに永続化します。
+CaddyがHTTPS証明書を取得・更新し、標準でログイン認証を行います。`.env` の `AUTH_ENABLED=false` でログインを無効にできます。その場合、URLにアクセスできる人がアプリを利用できます。アプリの8000番ポートは外部公開しません。モデルはイメージに含まれ、取得データはDocker volumeに永続化します。
 
 ## モデルとデータ
 
@@ -58,7 +59,7 @@ CaddyがHTTPS証明書を取得・更新し、ログイン認証を行います�
 
 チェックサム対象のCSV・設定JSONは`.gitattributes`でGitの改行変換を無効にしています。WindowsでpushしてLinuxでcloneしても同じバイト列を保持します。
 
-購入候補は回収率設定で上位5頭、的中率設定で上位1頭です。画面の5頭表示と購入候補数は別です。回帰のrankスコアはsoftmax値で、校正済み勝率ではありません。条件適合馬の中で購入スコア最大1頭を購入対象とします。
+購入候補は回収率設定で上位5頭、的中率設定で上位1頭です。画面はモデル順位上位5頭から、1倍を超え各AIのオッズ上限以下の馬だけを表示します。5頭未満でも下位から補充しません。表示数と購入候補数は別です。回帰のrankスコアはsoftmax値で、校正済み勝率ではありません。条件適合馬の中で購入スコア最大1頭を購入対象とします。
 
 ## 検証
 
@@ -66,7 +67,9 @@ CaddyがHTTPS証明書を取得・更新し、ログイン認証を行います�
 python -m unittest apps.race_predict.test_app tests.test_standalone
 ```
 
-同梱した実モデルによる5頭のスコア・購入対象・購入額が元CLIと一致すること、購入条件、開催一覧解析、公開ドメインのOriginとヘルスチェックをテストします。GitHub ActionsでもテストとDockerビルドを実行します。
+同梱した実モデルの表示対象馬のスコア・購入対象・購入額が元CLIと一致すること、オッズ条件、背景ジョブと再照会、開催一覧解析、公開ドメインのOriginとヘルスチェックをテストします。GitHub ActionsでもテストとDockerビルドを実行します。
+
+Chromeと対応Driverがある環境では `python -m tools.verify_webapp_ui` で、ページ離脱中の実モデル予測と再表示時の復元を確認できます。保存データを使い、外部レースサイトにはアクセスしません。
 
 Pythonの直接依存は`requirements.txt`、間接依存も固定した実行用ファイルは`requirements.lock`。更新時は`uv pip compile requirements.txt --output-file requirements.lock`で再生成し、同梱モデルのテストを実行してください。
 
